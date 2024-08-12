@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+ <div class="container">
+     {% if request.user.is_authenticated %}
+            <h1 style="padding-top:90px;">HEY,BUDDY... LET'S CHAT WITH YOUR FRIENDS..</h1><br><br>
+            <a href="{% url 'public_chat' %}"><button class = "btn btn-warning btn-lg" style="color:white;font-weight:bold;">HAVE A BIGTALK</button></a>
+     {% else %}
+        <div class="heading">
+            <h3 style="font-size: 36px;font-family: cursive;padding-left: 50px;padding-top: 20px;color:	rgb(99, 3, 48);">
+                <SPan>welcome!!...</SPan> We’re excited to have you join our community! Dive into the conversation, meet new people, and explore diverse
+            topics...</h3></div>
+        <a href="{% url 'signup' %}">
+            <button type="button" class="btn btn-success btn-lg" style="margin-top:100px;">Let's join with us.....</button>
+        </a>
+     {% endif %}
+    </div>
+<style>
+    .container{
+        text-align: center;
+        margin-left: 430px;
+        margin-top: 100px;
+        background-color:rgb(245, 245, 245);
+        background: url({% static 'account/images/chat3.avif' %});
+        width: 600px;
+        height: 500px;
+        border-radius: 150px;
+    }
+    .container:hover {
+        display:block;
+        background:	rgb(193, 225, 193);
+    }
+    .heading{
+        padding-top: 40px;
+        width: 550px;
+        background-color: rgba(255, 255, 255, 0);
+    }
+ </style>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+{% if messages %}
+    {% for i in messages %}
+        {% if i.tags == 'warning' %}
+            <script>
+                swal('{{i}}', '', 'warning')
+            </script>
+        {% elif i.tags == 'error' %}
+            <script>
+                swal('{{i}}', '', 'error')
+            </script>
+        {% elif i.tags == 'info' %}
+            <script>
+                swal('{{i}}', '', 'info')
+            </script>
+        {% else %}
+            <script>
+                swal('{{i}}', '', 'success')
+            </script>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+
+{% endblock %}

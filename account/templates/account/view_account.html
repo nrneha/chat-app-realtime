@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+<div class="card" style="width: 18rem;">
+<!--  <img src="..." class="card-img-top" alt="...">-->
+    <img class="account-image rounded-circle m-auto d-block "   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" src="{{profile.profile_image.url}}"  width="160" height="160" style="padding-top:10px;">
+    <div class="card-body">
+    <p class="card-text" style="padding-left:55px;">username : <span style="font-size:18px;color:brown;font-weight:bold;">{{user.username}}</span></p>
+        {% if request.user == user %}
+      <a href="{% url 'home' %}" style="padding-left:30px;"><button type="button" class="btn btn-secondary">Back</button></a>
+       <a href="{% url 'edit_account' user_id=user.id %}"><button type="button" class="btn btn-primary" style="margin-left:80px;">Edit</button></a>
+        {% else %}
+        <a href="{% url 'pr_chat' username=user.username %}"><button type="button" class="btn btn-primary btn-lg" style="margin-left:10px;"> Send a message to {{user.username}}</button></a>
+        {% endif %}
+  </div>
+</div>
+</div>
+
+<style>
+    .container{
+        margin-left:550px;
+        margin-top:100px;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<main class="content">
+    <div class="container p-0" style="width:650px;margin-top:30px;">
+        <div class="card">
+            <div class="row g-0">
+                <div class="col-12 col-lg-7 col-xl-12">
+                    <div class="py-2 px-4 border-bottom d-none d-lg-block">
+                        {% if other_user %}
+                                <img class="account-image rounded-circle m-auto d-block "   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" src="{{other_user.profile.profile_image.url}}"  width="40" height="40" style="padding-top:10px;">
+                                <p class="card-text" style="padding-left:62px;"><span style="font-size:18px;color:brown;font-weight:bold;margin-left:219px;">{{other_user.username}}</span></p>
+                        {% else %}
+                        <h5 style="color:green;">Welcome to public chat,</h5>
+                        <p style="color:blue;">Here, all the messages you have sent visible to all the members in the chat.</p>
+                      {% include 'chat/online_count.html' %}online
+                        {% endif %}
+                    </div>
+
+                    <div class="position-relative " >
+                        <div class="chat-messages p-4" id="chat_messages">
+                            {% for message in chat_messages reversed %}
+                            {% include 'chat/chat_message_part.html'%}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="flex-grow-0 py-3 px-4 border-top">
+                        <div class="input-group d-lg-block">
+                            <form id="chat_message_form"
+                                  hx-ext="ws"
+                                  ws-connect="/ws/chatroom/{{ chat_room_name }}"
+                                  ws-send
+                                  _="on htmx:wsAfterSend reset() me">
+                                {% csrf_token %}
+                                {{ form }}
+                            </form><br>
+                            <form id="chat_file_form" enctype="multipart/form-data"
+                                hx-post="{% url 'chat_file_upload' chat_room_name %}"
+                                hx-target="#chat_messages"
+                                hx-swap="beforeend"
+                                _="on htmx:beforeSend reset() me" >
+                                {% csrf_token %}
+                                <input type="file" name="file" id="id_file" >
+                                <button type="submit" class="btn btn-info">Submit File</button>
+                             </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<style>
+
+.chat-online {
+    color: #34ce57
+}
+
+.chat-offline {
+    color: #e4606d
+}
+
+.chat-messages {
+    display: flex;
+    flex-direction: column;
+   height: 500px;
+    overflow-y: scroll
+}
+
+.chat-message-left,
+.chat-message-right {
+    display: flex;
+    flex-shrink: 0
+}
+
+.chat-message-left {
+    margin-right: auto
+}
+
+.chat-message-right {
+    flex-direction: row-reverse;
+    margin-left: auto
+}
+.py-3 {
+    padding-top: 1rem!important;
+    padding-bottom: 1rem!important;
+}
+.px-4 {
+    padding-right: 1.5rem!important;
+    padding-left: 1.5rem!important;
+}
+.flex-grow-0 {
+    flex-grow: 0!important;
+}
+.border-top {
+    border-top: 1px solid #dee2e6!important;
+}
+</style>
+{% endblock %}
+
+{% block javascript %}
+<script>
+
+    function scrollToBottom(time=0) {
+        setTimeout(function() {
+            const container = document.getElementById('chat_messages');
+            container.scrollTop = container.scrollHeight;
+        }, time);
+    }
+    scrollToBottom()
+
+</script>
+{% endblock %}

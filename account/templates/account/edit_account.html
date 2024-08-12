@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+<div class="card" style="width: 18rem;">
+<!--  <img src="..." class="card-img-top" alt="...">-->
+    <form method="post" action="{% url 'save_profile_updates' user_id=user.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+    <img class="account-image rounded-circle m-auto d-block "   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" src="{{profile.profile_image.url}}"  width="160" height="160" style="padding-top:10px;">
+    <label style="padding-left:10px;color:red;">Edite profile image :</label>
+    <input type="file" name="profile_image" style="padding-left:20px;">
+    <div class="card-body">
+    <p class="card-text" style="padding-left:55px;">username : <span style="font-size:18px;color:brown;font-weight:bold;">{{user.username}}</span></p>
+        <input type="text" style="padding-left:10px;margin-left:25px;" placeholder="New user name" name="username" value="{{user.username}}">
+       <button type="submit" class="btn btn-primary" style="margin-left:10px;margin-top:20px;">Update</button>
+       </form>
+        <a href="{% url 'home' %}" style="margin-left:60px;padding-left:10px;"><button type="button" class="btn btn-secondary" style="margin-top:20px;">Back</button></a>
+  </div>
+</div>
+</div>
+
+<style>
+    .container{
+        margin-left:550px;
+        margin-top:100px;
+    }
+</style>
+{% endblock %}
