@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content%}
+
+<div class="card text-center mb-3" style="width: 650px;margin-left:400px;margin-top:150px;">
+  <div class="card-body">
+    <h5 class="card-title" style="color:red"><u>ACCOUNT DELETE</u></h5><br>
+    <p class="card-text">Hey, <span style="color:brown;"><b>{{user.username}}</b></span> it seems that you would like to delete your account.
+      Please note that this is a permanent action and cannot be undone. Once your account is deleted:</p><br>
+    <ul style="color:red;">
+    <li>All your personal information and account details will be permanently removed from our system.</li>
+    <li>We will not be able to recover your account or any associated data in the future.</li>
+</ul>
+    <a href="{% url 'confirm_account_delete' %}" class="btn btn-primary">I agree, Delete Account</a>
+  </div>
+</div>
+
+
+{% endblock %}

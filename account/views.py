@@ -64,7 +64,6 @@ def user_login(request):
     return redirect('login')
 
 
-
 def user_logout(request):
     logout(request)
     return redirect('home')
@@ -75,32 +74,36 @@ def view_account(request, user_id):
     profile = Profile.objects.get(user=user)
     return render(request, "account/view_account.html", {'user': user, 'profile': profile})
 
-def edit_account(request,user_id):
+
+def edit_account(request, user_id):
     user = User.objects.get(id=user_id)
     profile = Profile.objects.get(user=user.id)
-    return render(request,"account/edit_account.html",{'user':user,'profile':profile})
+    return render(request, "account/edit_account.html", {'user': user, 'profile': profile})
 
-def save_profile_updates(request,user_id):
+
+def save_profile_updates(request, user_id):
     user = User.objects.get(id=user_id)
     profile = Profile.objects.get(user=user)
-    if request.method=="POST":
+    if request.method == "POST":
         username = request.POST.get('username')
         try:
             profile_image = request.FILES['profile_image']
             x = FileSystemStorage()
-            new_image = x.save(profile_image.name,profile_image)
+            new_image = x.save(profile_image.name, profile_image)
         except MultiValueDictKeyError:
-            new_image = Profile.objects.get(user = user_id).profile_image
+            new_image = Profile.objects.get(user=user_id).profile_image
 
         user.username = username
         user.save()
         profile.profile_image = new_image
         profile.save()
-        return redirect(view_account,user_id)
+        return redirect(view_account, user_id)
 
 
+def delete_account(request, user_id):
+    user = User.objects.get(id=user_id)
+    return render(request, "account/account_delete.html", {'user': user})  # display account delete page
 
 
-
-
-
+def confirm_account_deletion(request):
+    return render(request, "account/confirm_account_delete.html")  # display confirmation page for account deletion
