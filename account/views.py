@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils.datastructures import MultiValueDictKeyError
 
+from Chatter.utils import login_required
 from account.models import Profile
 
 
@@ -105,5 +106,35 @@ def delete_account(request, user_id):
     return render(request, "account/account_delete.html", {'user': user})  # display account delete page
 
 
-def confirm_account_deletion(request):
-    return render(request, "account/confirm_account_delete.html")  # display confirmation page for account deletion
+def confirm_account_deletion(request, user_id):
+    user = User.objects.get(id=user_id)
+    return render(request, "account/confirm_account_delete.html",
+                  {'user': user})  # display confirmation page for account deletion
+
+
+@login_required
+def account_deletion(request, user_id):
+    user = User.objects.get(id=user_id)
+    if request.method == "POST":
+        password = request.POST.get('password')
+
+        # Authenticate the user
+        authenticated_user = authenticate(username=user.username, password=password)
+        if authenticated_user is not None and authenticated_user == user:
+            # Log out the user before deleting their account
+            logout(request)
+            user.delete()
+            messages.success(request,"You have successfully deleted your account.")
+            return redirect("home")
+        else:
+            return render(request, "account/confirm_account_delete.html", {"error": "Sorry..!!  Invalid credentials."})
+
+    else:
+        return redirect("account_delete")
+
+
+
+
+
+
+

@@ -12,7 +12,7 @@
     <li>All your personal information and account details will be permanently removed from our system.</li>
     <li>We will not be able to recover your account or any associated data in the future.</li>
 </ul>
-    <a href="{% url 'confirm_account_delete' %}" class="btn btn-primary">I agree, Delete Account</a>
+    <a href="{% url 'confirm_account_delete' user_id=user.id%}" class="btn btn-primary">I agree, Delete Account</a>
   </div>
 </div>
 

@@ -6,21 +6,19 @@
 <div class="card text-center mb-3" style="width: 650px;margin-left:400px;margin-top:150px;">
   <div class="card-body">
     <h5 class="card-title" style="color:red"><u>ACCOUNT DELETE</u></h5><br>
-    <p class="card-text">Hi, <span style="color:brown;"><b>{{user.username}}</b></span> it seems that you ready to delete your account,
-        for that confirm your username and password once again and click the confirmation button to delete your account.
-    </p>
+    <p style="color:red">By,clicking the 'Delete Account' button you are confirming that you read all the instruction and okay to delete your account. </p>
+      <p style="color:green">THANK YOU,</p>
       <div>
-          <form method="post" action="#">
-             <p class="confirmation">Confirm username</p>
-              <input type="text" style="border: 1px solid grey;border-radius:5px;" name="username" required><br><br>
+          <form method="post" action="{% url 'account_deletion' user_id=user.id %}">
+              {% csrf_token %}
               <p class="confirmation">Confirm password</p>
-              <input type="password" style="border: 1px solid grey;border-radius:5px;" name="password"required><br><br><br>
-              <button type="submit" class="btn btn-outline-primary"> confirm, Delete Account</button>
+              <input type="password" style="border: 1px solid grey;border-radius:5px;" name="password" required=""><br><br><br>
+              <button type="submit" class="btn btn-outline-primary"> confirm, Delete Account</button><br><br>
+              <h4 style="color:red">{{error}}</h4>
           </form>
       </div><br>
 
-      <p style="color:red">By,clicking the 'Delete Account' button you are confirming that you read all the instruction and okay to delete your account. </p>
-      <p style="color:green">THANK YOU,</p>
+
 
 
   </div>

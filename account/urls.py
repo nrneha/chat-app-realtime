@@ -13,7 +13,8 @@ urlpatterns = [
     path('edit_account/<int:user_id>',views.edit_account,name="edit_account"),
     path('save_profile_updates/<int:user_id>',views.save_profile_updates,name="save_profile_updates"),
     path('account_delete/<int:user_id>',views.delete_account,name="account_delete"),
-    path('confirm_account_delete/',views.confirm_account_deletion,name="confirm_account_delete"),
+    path('confirm_account_delete/<int:user_id>',views.confirm_account_deletion,name="confirm_account_delete"),
+    path('account_deletion/<int:user_id>',views.account_deletion,name="account_deletion"),
 
 
 ]
