@@ -49,9 +49,9 @@ def do_private_chatroom(request, username):
         return redirect('home')
 
     other_user = User.objects.get(username=username)
-    print("the other user",other_user)
+    # print("the other user",other_user)
     self_chatrooms = request.user.chat_groups.filter(is_private=True)
-    print(self_chatrooms)
+    # print(self_chatrooms)
 
     if self_chatrooms.exists():
         for chatroom in self_chatrooms:
@@ -60,7 +60,7 @@ def do_private_chatroom(request, username):
 
     chatroom = ChatGroup.objects.create(is_private=True)
     chatroom.members.add(other_user, request.user)
-    print(chatroom.group_name)
+    # print(chatroom.group_name)
 
     return redirect('chatroom', chatroom.group_name)
 
@@ -87,3 +87,4 @@ def chat_file_upload(request, chat_room_name):
         )
 
         return HttpResponse()
+

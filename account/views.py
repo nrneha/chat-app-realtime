@@ -7,6 +7,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 
 from Chatter.utils import login_required
 from account.models import Profile
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -124,7 +125,7 @@ def account_deletion(request, user_id):
             # Log out the user before deleting their account
             logout(request)
             user.delete()
-            messages.success(request,"You have successfully deleted your account.")
+            messages.success(request, "You have successfully deleted your account.")
             return redirect("home")
         else:
             return render(request, "account/confirm_account_delete.html", {"error": "Sorry..!!  Invalid credentials."})
@@ -133,8 +134,48 @@ def account_deletion(request, user_id):
         return redirect("account_delete")
 
 
+def forgot_password_page(request):
+    return render(request, "account/reset_password.html")
 
 
+def password_reset_verification(request):
+    if request.method == "POST":
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+
+        if User.objects.filter(username=username).exists():
+            user = User.objects.get(username=username)
+            if user.email == email:
+                return redirect("confirm_password_page", username)
+            else:
+                return render(request, "account/reset_password.html", {'error': "Incorrect email id"})
+        else:
+            return render(request, "account/reset_password.html", {'error': "Incorrect username"})
+    else:
+        return redirect("login")
 
 
+def confirm_password_page(request, username):
+    user = User.objects.get(username=username)
+    return render(request, "account/confirm_new_password.html", {'user': user})
 
+
+def reset_password(request, username):
+    user = User.objects.get(username=username)
+
+
+    if request.method == "POST":
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+        if password1 == password2:
+            user = User.objects.get(username=username)
+            user.set_password(password1)
+            user.save()
+            # User.objects.filter(username=username).update(password=password1)
+            messages.success(request,"Your password has been reset successfully! "
+                                     "You can now log in with your new password.")
+            return redirect("login")
+        else:
+            return render(request, "account/confirm_new_password.html", {'error': "sorry..password does not match!!",'user':user})
+    else:
+        return redirect("confirm_password_page", username)

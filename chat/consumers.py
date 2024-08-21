@@ -74,3 +74,5 @@ class ChatroomConsumer(WebsocketConsumer):
         online_count = event['online_count']
         html = render_to_string("chat/online_count.html",{'online_count':online_count})
         self.send(text_data=html)
+
+
