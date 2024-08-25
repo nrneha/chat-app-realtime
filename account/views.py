@@ -57,7 +57,7 @@ def signup_stage(request):
             messages.success(request, "Account created successfully")
             subject = "Account Created"
             message = "Congratulations user, welcome to BigTalk. Have a nice day. Thank you"
-            send_mail(subject, message, EMAIL_HOST_USER, [user.email], fail_silently=False, )
+            send_mail(subject, message, EMAIL_HOST_USER, [user.email], fail_silently=False, )  # send gmail
         return redirect('login')
     return redirect('signup')
 
@@ -131,15 +131,15 @@ def account_delete_otp_sending(request, user_id):
     user = User.objects.get(id=user_id)
     if request.method == "POST":
         u_email = request.POST.get('email')
-        n_otp = generate_otp(request)
+        n_otp = generate_otp(request) # generate otp by calling generate_otp()
         subject = "Confirm Account Deletion"
         message = f"Dear {user.username} OTP for deleting your account is : {n_otp}   Thank you , Team BigTalk"
-        send_mail(subject, message, EMAIL_HOST_USER, [u_email], fail_silently=True, )
+        send_mail(subject, message, EMAIL_HOST_USER, [u_email], fail_silently=True, ) # send otp to gmail
         context = {
-            'message' : "An OTP has sent your registered email id",
+            'message': "An OTP has sent your registered email id",
             'n_otp': n_otp,
         }
-        return render(request, "account/account_delete_otp_verification.html",context)
+        return render(request, "account/account_delete_otp_verification.html", context)
     else:
         return redirect("account_delete", user.id)
 
@@ -155,33 +155,48 @@ def account_deletion(request, u_otp):
             messages.success(request, "You have successfully deleted your account.")
             return redirect("home")
         else:
-            return render(request,"account/account_delete_otp_verification.html",{'error':"OTP not verified.!!",'n_otp':u_otp})
+            return render(request, "account/account_delete_otp_verification.html",
+                          {'error': "OTP not verified.!!", 'n_otp': u_otp})
     else:
-        return redirect("account_delete",user.id)
+        return redirect("account_delete", user.id)
+
+
 def forgot_password_page(request):
     return render(request, "account/reset_password.html")
 
 
 def password_reset_verification(request):
     if request.method == "POST":
-        username = request.POST.get('username')
         email = request.POST.get('email')
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email=email)
+            u_otp = generate_otp(request)
+            subject = "Confirm Account Deletion"
+            message = f"Dear user OTP for reset your account password is : {u_otp}   Thank you , Team BigTalk"
+            send_mail(subject, message, EMAIL_HOST_USER, [email], fail_silently=True, )
+            context = {
+                'message':"An OTP sent to your registered email id.",
+                'user':user.username,
+                'u_otp':u_otp,
 
-        if User.objects.filter(username=username).exists():
-            user = User.objects.get(username=username)
-            if user.email == email:
-                return redirect("confirm_password_page", username)
-            else:
-                return render(request, "account/reset_password.html", {'error': "Incorrect email id"})
+            }
+            return render(request,"account/password_reset_otp.html",context)
         else:
-            return render(request, "account/reset_password.html", {'error': "Incorrect username"})
+            return render(request,"account/reset_password.html",{'error':"Sorry..Invalid email id"})
     else:
-        return redirect("login")
+        return redirect("home")
+
+def passwordReset_verify_otp(request,p_otp):
+    if request.method == "POST":
+        u_otp = request.POST.get('otp')
+        if u_otp == p_otp:
+            return redirect("login")
+        else:
+            return redirect("signup")
+    else:
+        return redirect("home")
 
 
-def confirm_password_page(request, username):
-    user = User.objects.get(username=username)
-    return render(request, "account/confirm_new_password.html", {'user': user})
 
 
 def reset_password(request, username):

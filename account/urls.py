@@ -18,7 +18,9 @@ urlpatterns = [
     path('account_deletion/<str:u_otp>',views.account_deletion,name="account_deletion"),
     path('password_reset/',views.forgot_password_page,name="password_reset"),
     path('reset_verification/',views.password_reset_verification,name="reset_verification"),
-    path('confirm_password_page/<str:username>',views.confirm_password_page,name="confirm_password_page"),
+    path('reset_otp_verify/<str:p_otp>',views.passwordReset_verify_otp,name="reset_otp_verify"),
+    # path('password_otp/',views.password_reset_otp_page,name="password_otp"),
+    # path('confirm_password_page/',views.confirm_password_page,name="confirm_password_page"),
     path('reset_password/<str:username>',views.reset_password,name="reset_password"),
 
 
