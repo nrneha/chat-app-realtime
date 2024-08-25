@@ -77,9 +77,10 @@
           </ul>
         </li>
           <h3 style="margin-left:200px;padding-top:10px;font-family:fantasy;">Hi,<span style="color:brown;"> {{request.user.username|upper}}</span></h3>
-        <h2 style="margin-left:550px;padding-top:10px;font-family:fantasy;color:#097969;"> WELCOME TO BigTalk </h2>
+        <h2 style="margin-left:650px;padding-top:10px;font-family:fantasy;color:#097969;"> WELCOME TO <a href="{% url 'public_chat' %}">BigTalk</a></h2>
 
       </ul>
+
 <!--      <form class="d-flex" method="post" id="search-form" action="#">-->
 <!--          {% csrf_token %}-->
 <!--        <input class="form-control me-2" name="q" placeholder="Search" aria-label="Search" id="search-box">-->

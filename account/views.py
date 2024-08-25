@@ -1,3 +1,5 @@
+import random
+
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
@@ -9,8 +11,17 @@ from Chatter.utils import login_required
 from account.models import Profile
 from django.http import JsonResponse
 
+from django.core.mail import send_mail
+from Chatter.settings import EMAIL_HOST_USER
 
-# Create your views here.
+otp = ""
+
+
+def generate_otp(request):
+    otp = random.randint(136782, 985643)
+    return (otp)
+
+
 def home_page(request):
     return render(request, "account/home.html")
 
@@ -44,6 +55,9 @@ def signup_stage(request):
             profile = Profile(user=user)
             profile.save()
             messages.success(request, "Account created successfully")
+            subject = "Account Created"
+            message = "Congratulations user, welcome to BigTalk. Have a nice day. Thank you"
+            send_mail(subject, message, EMAIL_HOST_USER, [user.email], fail_silently=False, )
         return redirect('login')
     return redirect('signup')
 
@@ -113,27 +127,37 @@ def confirm_account_deletion(request, user_id):
                   {'user': user})  # display confirmation page for account deletion
 
 
-@login_required
-def account_deletion(request, user_id):
+def account_delete_otp_sending(request, user_id):
     user = User.objects.get(id=user_id)
     if request.method == "POST":
-        password = request.POST.get('password')
+        u_email = request.POST.get('email')
+        n_otp = generate_otp(request)
+        subject = "Confirm Account Deletion"
+        message = f"Dear {user.username} OTP for deleting your account is : {n_otp}   Thank you , Team BigTalk"
+        send_mail(subject, message, EMAIL_HOST_USER, [u_email], fail_silently=True, )
+        context = {
+            'message' : "An OTP has sent your registered email id",
+            'n_otp': n_otp,
+        }
+        return render(request, "account/account_delete_otp_verification.html",context)
+    else:
+        return redirect("account_delete", user.id)
 
-        # Authenticate the user
-        authenticated_user = authenticate(username=user.username, password=password)
-        if authenticated_user is not None and authenticated_user == user:
-            # Log out the user before deleting their account
+
+@login_required
+def account_deletion(request, u_otp):
+    user = request.user
+    if request.method == "POST":
+        f_otp = request.POST.get('otp')
+        if f_otp == u_otp:
             logout(request)
             user.delete()
             messages.success(request, "You have successfully deleted your account.")
             return redirect("home")
         else:
-            return render(request, "account/confirm_account_delete.html", {"error": "Sorry..!!  Invalid credentials."})
-
+            return render(request,"account/account_delete_otp_verification.html",{'error':"OTP not verified.!!",'n_otp':u_otp})
     else:
-        return redirect("account_delete")
-
-
+        return redirect("account_delete",user.id)
 def forgot_password_page(request):
     return render(request, "account/reset_password.html")
 
@@ -163,7 +187,6 @@ def confirm_password_page(request, username):
 def reset_password(request, username):
     user = User.objects.get(username=username)
 
-
     if request.method == "POST":
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
@@ -172,10 +195,11 @@ def reset_password(request, username):
             user.set_password(password1)
             user.save()
             # User.objects.filter(username=username).update(password=password1)
-            messages.success(request,"Your password has been reset successfully! "
-                                     "You can now log in with your new password.")
+            messages.success(request, "Your password has been reset successfully! "
+                                      "You can now log in with your new password.")
             return redirect("login")
         else:
-            return render(request, "account/confirm_new_password.html", {'error': "sorry..password does not match!!",'user':user})
+            return render(request, "account/confirm_new_password.html",
+                          {'error': "sorry..password does not match!!", 'user': user})
     else:
         return redirect("confirm_password_page", username)
