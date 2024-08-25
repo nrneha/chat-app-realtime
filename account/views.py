@@ -131,10 +131,10 @@ def account_delete_otp_sending(request, user_id):
     user = User.objects.get(id=user_id)
     if request.method == "POST":
         u_email = request.POST.get('email')
-        n_otp = generate_otp(request) # generate otp by calling generate_otp()
+        n_otp = generate_otp(request)  # generate otp by calling generate_otp()
         subject = "Confirm Account Deletion"
         message = f"Dear {user.username} OTP for deleting your account is : {n_otp}   Thank you , Team BigTalk"
-        send_mail(subject, message, EMAIL_HOST_USER, [u_email], fail_silently=True, ) # send otp to gmail
+        send_mail(subject, message, EMAIL_HOST_USER, [u_email], fail_silently=True, )  # send otp to gmail
         context = {
             'message': "An OTP has sent your registered email id",
             'n_otp': n_otp,
@@ -150,8 +150,8 @@ def account_deletion(request, u_otp):
     if request.method == "POST":
         f_otp = request.POST.get('otp')
         if f_otp == u_otp:
-            logout(request)
-            user.delete()
+            logout(request) # logout before deleting the account
+            user.delete() # delete user account from the db
             messages.success(request, "You have successfully deleted your account.")
             return redirect("home")
         else:
@@ -161,7 +161,7 @@ def account_deletion(request, u_otp):
         return redirect("account_delete", user.id)
 
 
-def forgot_password_page(request):
+def forgot_password_page(request): # Render forgot password page
     return render(request, "account/reset_password.html")
 
 
@@ -173,48 +173,57 @@ def password_reset_verification(request):
             u_otp = generate_otp(request)
             subject = "Confirm Account Deletion"
             message = f"Dear user OTP for reset your account password is : {u_otp}   Thank you , Team BigTalk"
-            send_mail(subject, message, EMAIL_HOST_USER, [email], fail_silently=True, )
+            send_mail(subject, message, EMAIL_HOST_USER, [email], fail_silently=True, ) # send otp to mail
             context = {
-                'message':"An OTP sent to your registered email id.",
-                'user':user.username,
-                'u_otp':u_otp,
+                'message': "An OTP sent to your registered email id.",
+                'user': user,
+                'u_otp': u_otp,
 
             }
-            return render(request,"account/password_reset_otp.html",context)
+            return render(request, "account/password_reset_otp.html", context)
         else:
-            return render(request,"account/reset_password.html",{'error':"Sorry..Invalid email id"})
+            return render(request, "account/reset_password.html", {'error': "Sorry..Invalid email id"})
     else:
         return redirect("home")
 
-def passwordReset_verify_otp(request,p_otp):
+
+def passwordReset_verify_otp(request, p_otp,user_id):
+    user = User.objects.get(id=user_id)
     if request.method == "POST":
         u_otp = request.POST.get('otp')
-        if u_otp == p_otp:
-            return redirect("login")
+        if u_otp == p_otp: # verifying the two otp
+            context = {
+                'user':user
+            }
+            return render(request,"account/confirm_new_password.html",context)
         else:
-            return redirect("signup")
+            context ={
+                'error':"OTP does not match.!!",
+                'u_otp':p_otp,
+                'user':user,
+            }
+            return render(request,"account/password_reset_otp.html",context)
     else:
-        return redirect("home")
-
-
+        return redirect("password_reset")
 
 
 def reset_password(request, username):
-    user = User.objects.get(username=username)
-
     if request.method == "POST":
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
         if password1 == password2:
             user = User.objects.get(username=username)
             user.set_password(password1)
-            user.save()
+            user.save() # save the new password
             # User.objects.filter(username=username).update(password=password1)
             messages.success(request, "Your password has been reset successfully! "
                                       "You can now log in with your new password.")
+            subject = "Password Changed"
+            message = f"Dear user password has been recently changed   Thank you , Team BigTalk"
+            send_mail(subject, message, EMAIL_HOST_USER, [user.email], fail_silently=True, ) # send password message to gmail
             return redirect("login")
         else:
             return render(request, "account/confirm_new_password.html",
-                          {'error': "sorry..password does not match!!", 'user': user})
+                          {'error': "sorry..password does not match!!", 'user': username})
     else:
-        return redirect("confirm_password_page", username)
+        return redirect("home")
