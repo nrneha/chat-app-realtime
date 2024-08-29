@@ -171,7 +171,7 @@ def password_reset_verification(request):
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
             u_otp = generate_otp(request)
-            subject = "Confirm Account Deletion"
+            subject = "Forgot Password"
             message = f"Dear user OTP for reset your account password is : {u_otp}   Thank you , Team BigTalk"
             send_mail(subject, message, EMAIL_HOST_USER, [email], fail_silently=True, ) # send otp to mail
             context = {
