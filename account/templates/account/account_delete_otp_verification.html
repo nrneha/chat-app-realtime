@@ -4,11 +4,11 @@
 {% block content %}
 <div class="card text-center mb-3" style="width: 650px;margin-left:400px;margin-top:150px;">
   <div class="card-body">
-    <h5 class="card-title" style="color:red"><u>VERIFY OTP</u></h5><br>
+    <h5 class="card-title" style="color:brown"><u>VERIFY OTP</u></h5><br>
       <div>
-          <p style="color:brown;">{{message}}</p>
+          <p style="color:red;">{{error}}</p>
           <p style="color:blue">Enter/Copy the OTP sent to your email id and verify it</p>
-          <form method="post" action="{% url 'account_deletion' u_otp=n_otp%}">
+          <form method="post" action="{% url 'account_deletion' user_id=user.id %}">
               {% csrf_token %}
               <input type="text" name="otp" placeholder="Enter OTP"><br><br>
               <button type="submit" class="btn btn-outline-success">Verify OTP</button>
